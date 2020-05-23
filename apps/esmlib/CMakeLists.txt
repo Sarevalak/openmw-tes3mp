@@ -21,7 +21,10 @@ if(BUILD_WITH_LUA)
 endif(BUILD_WITH_LUA)
 
 set(ESMPROXY ./esm/esmreader.hpp ./esm/esmcommon.hpp ./esm/loadtes3.hpp ./esm/loadtes3.cpp ./esm/loadalch.hpp ./esm/effectlist.hpp ./esm/loadacti.hpp
-            ./esm/loadappa.hpp ./esm/loadarmo.hpp ./esm/loadland.hpp ./esm/loadmgef.hpp ./esm/loaddoor.hpp ./esm/loadbook.hpp ./esm/cellid.hpp)
+            ./esm/loadappa.hpp ./esm/loadarmo.hpp ./esm/loadland.hpp ./esm/loadmgef.hpp ./esm/loaddoor.hpp ./esm/loadbook.hpp ./esm/cellid.hpp
+			 ./esm/variant.hpp ./esm/loadstat.hpp ./esm/loadspel.hpp ./esm/loadskil.hpp ./esm/loadmisc.hpp ./esm/loadltex.hpp ./esm/loadingr.hpp
+			  ./esm/loadglob.hpp ./esm/loadench.hpp ./esm/loadcrea.hpp ./esm/loadcont.hpp ./esm/loadclot.hpp ./esm/loadclas.hpp ./esm/loadbsgn.hpp
+			  ./esm/loadbody.hpp ./esm/transport_dest.hpp)
 
 source_group(apps\\esmlib\\esm FILES ${ESMPROXY})
 source_group(apps\\esmlib FILES ${ESMLIB} ${LuaScript_Headers} ${LuaScript_Sources})
