@@ -35,6 +35,7 @@
 #include "esm/loadbsgn.hpp"
 #include "esm/loadbody.hpp"
 #include "esm/transport_dest.hpp"
+#include "esm/landutils.hpp"
 
 using namespace luabridge;
 
@@ -519,6 +520,15 @@ void register_esmlib(lua_State* L) {
         .addProperty("rotY", &ESM::LDest::getRotY)
         .addProperty("rotZ", &ESM::LDest::getRotZ)
         .addProperty("cellName", &ESM::LDest::getCellName)
+        .endClass()
+
+        .beginClass<ESM::LLandUtils>("LandUtils")
+        .addConstructor<void (*)()>()
+        .addStaticFunction("getVtexIndexAt", &ESM::LLandUtils::getVtexIndexAt)
+        .addStaticFunction("getVertexHeight", &ESM::LLandUtils::getVertexHeight)
+        .addStaticFunction("getCellX", &ESM::LLandUtils::getCellX)
+        .addStaticFunction("getCellY", &ESM::LLandUtils::getCellY)
+        .addStaticFunction("getHeightAt", &ESM::LLandUtils::getHeightAt)
         .endClass()
 
         .endNamespace();

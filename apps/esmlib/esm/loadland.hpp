@@ -157,6 +157,10 @@ namespace ESM
         int getAvailableData(int flags) const {
             return flags & this->getDataTypes();
         }
+
+        const Land* getLand() {
+            return &this->data;
+        }
     private:
         Land data;
     };
