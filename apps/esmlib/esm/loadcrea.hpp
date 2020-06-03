@@ -88,8 +88,12 @@ namespace ESM
                 return this->data.mData.mStealth;
             }
             int getAttack(lua_State* L) {
-                // TODO: implement method!
-                return 0;
+                LuaRef table = newTable(L);
+                for (int i = 0; i < 6; i++) {
+                    table.append(this->data.mData.mAttack[i]);
+                }
+                push(L, table);
+                return 1;
             }
             int getGold() const {
                 return this->data.mData.mGold;
