@@ -77,6 +77,9 @@ BULLET_DOUBLE=""
 BULLET_DBL=""
 BULLET_DBL_DISPLAY="Single precision"
 
+# Set flag to true to use OSGoS
+USE_OSGOS=""
+
 ACTIVATE_MSVC=""
 SINGLE_CONFIG=""
 
@@ -485,15 +488,28 @@ if [ -z $SKIP_DOWNLOAD ]; then
 	  "https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OpenAL-Soft-1.20.1.zip" \
 		"OpenAL-Soft-1.20.1.zip"
 
-	# OSGoS
-	download "OSGoS 3.6.5" \
-		"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" \
-		"OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z"
+	if [ -n "$USE_OSGOS" ]; then
+		# OSGoS
+		download "OSGoS 3.6.5" \
+			"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" \
+			"OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z"
 
-	if [ -n "$PDBS" ]; then
-		download "OSGoS symbols" \
-			"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" \
-			"OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z"
+		if [ -n "$PDBS" ]; then
+			download "OSGoS symbols" \
+				"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" \
+				"OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z"
+		fi
+	else
+		# OSG
+		download "OSG 3.6.5" \
+			"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" \
+			"OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}.7z"
+
+		if [ -n "$PDBS" ]; then
+			download "OSG symbols" \
+				"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OSGoS-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" \
+				"OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z"
+		fi
 	fi
 
 	# SDL2
@@ -695,7 +711,7 @@ printf "OpenAL-Soft 1.20.1... "
 cd $DEPS
 echo
 # OSG
-printf "OSG 3.6.5... "
+printf "OSG/OSGoS 3.6.5... "
 {
 	cd $DEPS_INSTALL
 	if [ -d OSG ] && \
@@ -706,9 +722,15 @@ printf "OSG 3.6.5... "
 		printf "Exists. "
 	elif [ -z $SKIP_EXTRACT ]; then
 		rm -rf OSG
-		eval 7z x -y "${DEPS}/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" $STRIP
-		[ -n "$PDBS" ] && eval 7z x -y "${DEPS}/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" $STRIP
-		mv "OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}" OSG
+		if [ -n "$USE_OSGOS" ]; then
+			eval 7z x -y "${DEPS}/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" $STRIP
+			[ -n "$PDBS" ] && eval 7z x -y "${DEPS}/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" $STRIP
+			mv "OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}" OSG
+		else
+			eval 7z x -y "${DEPS}/OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" $STRIP
+			[ -n "$PDBS" ] && eval 7z x -y "${DEPS}/OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" $STRIP
+			mv "OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}" OSG
+		fi
 	fi
 	OSG_SDK="$(real_pwd)/OSG"
 	add_cmake_opts -DOSG_DIR="$OSG_SDK"
