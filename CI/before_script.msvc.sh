@@ -1020,40 +1020,24 @@ echo
 echo "Setting up OpenMW build..."
 add_cmake_opts -DOPENMW_MP_BUILD=on
 add_cmake_opts -DOPENMW_LTO_BUILD=1
+
 add_cmake_opts -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"
 if [ ! -z $CI ]; then
-	case $STEP in
-		components )
-			echo "  Building subproject: Components."
-			add_cmake_opts -DBUILD_ESSIMPORTER=no \
-				-DBUILD_LAUNCHER=no \
-				-DBUILD_MWINIIMPORTER=no \
-				-DBUILD_OPENCS=no \
-				-DBUILD_OPENMW=no \
-				-DBUILD_WIZARD=no
-			;;
-		openmw )
-			echo "  Building subproject: OpenMW."
-			add_cmake_opts -DBUILD_ESSIMPORTER=no \
-				-DBUILD_LAUNCHER=no \
-				-DBUILD_MWINIIMPORTER=no \
-				-DBUILD_OPENCS=no \
-				-DBUILD_WIZARD=no
-			;;
-		opencs )
-			echo "  Building subproject: OpenCS."
-			add_cmake_opts -DBUILD_ESSIMPORTER=no \
-				-DBUILD_LAUNCHER=no \
-				-DBUILD_MWINIIMPORTER=no \
-				-DBUILD_OPENMW=no \
-				-DBUILD_WIZARD=no
-			;;
-		misc )
-			echo "  Building subprojects: Misc."
-			add_cmake_opts -DBUILD_OPENCS=no \
-				-DBUILD_OPENMW=no
-			;;
-	esac
+	add_cmake_opts -DBUILD_OPENMW=ON \
+		-DBUILD_LAUNCHER=ON \
+		-DBUILD_WIZARD=ON \
+		-DBUILD_MWINIIMPORTER=ON \
+		-DBUILD_OPENCS=OFF \
+		-DBUILD_ESSIMPORTER=OFF \
+		-DBUILD_BSATOOL=OFF \
+		-DBUILD_ESMTOOL=OFF \
+		-DBUILD_NIFTEST=OFF \
+		-DBUILD_DOCS=OFF \
+		-DBUILD_WITH_CODE_COVERAGE=OFF \
+		-DBUILD_UNITTESTS=OFF \
+		-DBUILD_OPENMW_MP=ON \
+		-DBUILD_BROWSER=OFF \
+		-DBUILD_MASTER=OFF
 fi
 # NOTE: Disable this when/if we want to run test cases
 #if [ -z $CI ]; then
