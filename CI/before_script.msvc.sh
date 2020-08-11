@@ -99,9 +99,6 @@ while [ $# -gt 0 ]; do
 			d )
 				SKIP_DOWNLOAD=true ;;
 
-			D )
-				BULLET_DOUBLE=true ;;
-
 			e )
 				SKIP_EXTRACT=true ;;
 
@@ -147,8 +144,6 @@ Options:
 		Set the configuration, can also be set with environment variable CONFIGURATION.
 	-d
 		Skip checking the downloads.
-	-D
-		Use double-precision Bullet
 	-e
 		Skip extracting dependencies.
 	-h
@@ -429,6 +424,9 @@ if ! [ -z $UNITY_BUILD ]; then
 	add_cmake_opts "-DOPENMW_UNITY_BUILD=True"
 fi
 
+# Build fails with single precission bullet
+BULLET_DOUBLE=true
+
 if [ -n "$BULLET_DOUBLE" ]; then
 	BULLET_DBL="-double"
 	BULLET_DBL_DISPLAY="Double precision"
@@ -454,53 +452,69 @@ if [ -z $SKIP_DOWNLOAD ]; then
 	# Boost
 	if [ -z $APPVEYOR ]; then
 		download "Boost ${BOOST_VER}" \
-			"https://sourceforge.net/projects/boost/files/boost-binaries/${BOOST_VER}/boost_${BOOST_VER_URL}-msvc-${MSVC_VER}-${BITS}.exe" \
+			"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/boost_${BOOST_VER_URL}-msvc-${MSVC_VER}-${BITS}.exe" \
 			"boost-${BOOST_VER}-msvc${MSVC_VER}-win${BITS}.exe"
 	fi
 
 	# Bullet
-	download "Bullet 2.89 (${BULLET_DBL_DISPLAY})" \
-		"https://rgw.ctrl-c.liu.se/openmw/Deps/Bullet-2.89-msvc${MSVC_YEAR}-win${BITS}${BULLET_DBL}.7z" \
-		"Bullet-2.89-msvc${MSVC_YEAR}-win${BITS}${BULLET_DBL}.7z"
+	download "Bullet 2.89" \
+		"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/Bullet-2.89-msvc${MSVC_YEAR}-win${BITS}-double.7z" \
+		"Bullet-2.89-msvc${MSVC_YEAR}-win${BITS}-double.7z"
 
 	# FFmpeg
 	download "FFmpeg 4.2.2" \
-		"https://ffmpeg.zeranoe.com/builds/win${BITS}/shared/ffmpeg-4.2.2-win${BITS}-shared.zip" \
+	  "https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/ffmpeg-4.2.2-win${BITS}.zip" \
 		"ffmpeg-4.2.2-win${BITS}.zip" \
-		"https://ffmpeg.zeranoe.com/builds/win${BITS}/dev/ffmpeg-4.2.2-win${BITS}-dev.zip" \
+		"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/ffmpeg-4.2.2-dev-win${BITS}.zip" \
 		"ffmpeg-4.2.2-dev-win${BITS}.zip"
 
+	# Build fails with newer version of MyGUI (3.4.0, 3.4.1)
 	# MyGUI
-	download "MyGUI 3.4.0" \
-		"https://rgw.ctrl-c.liu.se/openmw/Deps/MyGUI-3.4.0-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" \
-		"MyGUI-3.4.0-msvc${MSVC_REAL_YEAR}-win${BITS}.7z"
+	download "MyGUI 3.2.3" \
+		"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/MyGUI-3.2.3-git-msvc2015-win${BITS}.7z" \
+		"MyGUI-3.2.3-git-msvc2015-win${BITS}.7z"
 
 	if [ -n "$PDBS" ]; then
 		download "MyGUI symbols" \
-			"https://rgw.ctrl-c.liu.se/openmw/Deps/MyGUI-3.4.0-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" \
-			"MyGUI-3.4.0-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z"
+			"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/MyGUI-3.2.3-git-msvc2015-win${BITS}-sym.7z" \
+			"MyGUI-3.2.3-git-msvc2015-win${BITS}-sym.7z"
 	fi
 
 	# OpenAL
 	download "OpenAL-Soft 1.20.1" \
-		"http://openal-soft.org/openal-binaries/openal-soft-1.20.1-bin.zip" \
+	  "https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OpenAL-Soft-1.20.1.zip" \
 		"OpenAL-Soft-1.20.1.zip"
 
-	# OSG
-	download "OpenSceneGraph 3.6.5" \
-		"https://rgw.ctrl-c.liu.se/openmw/Deps/OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" \
-		"OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}.7z"
+	# OSGoS
+	download "OSGoS 3.6.5" \
+		"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" \
+		"OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z"
 
 	if [ -n "$PDBS" ]; then
-		download "OpenSceneGraph symbols" \
-			"https://rgw.ctrl-c.liu.se/openmw/Deps/OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" \
-			"OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z"
+		download "OSGoS symbols" \
+			"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" \
+			"OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z"
 	fi
 
 	# SDL2
 	download "SDL 2.0.12" \
-		"https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip" \
+		"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/SDL2-2.0.12.zip" \
 		"SDL2-2.0.12.zip"
+
+	# LuaJIT
+	download "LuaJIT 2.1.0-beta3" \
+		"https://gitlab.com/OpenMW/openmw-deps/-/raw/main/windows/LuaJIT-2.1.0-beta3-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" \
+		"LuaJIT-2.1.0-beta3-msvc${MSVC_REAL_YEAR}-win${BITS}.7z"
+	
+	# CrabNet
+	if [ ! -d CrabNet ]; then
+		git clone -b master https://github.com/TES3MP/CrabNet.git --depth 1
+	else
+		echo "CrabNet exists"
+		cd CrabNet
+		git pull
+		cd ..
+	fi
 
 	# Google test and mock
 	if [ ! -z $TEST_FRAMEWORK ]; then
@@ -603,8 +617,8 @@ printf "Bullet 2.89 (${BULLET_DBL_DISPLAY})... "
 		printf -- "Exists. (No version checking) "
 	elif [ -z $SKIP_EXTRACT ]; then
 		rm -rf Bullet
-		eval 7z x -y "${DEPS}/Bullet-2.89-msvc${MSVC_YEAR}-win${BITS}${BULLET_DBL}.7z" $STRIP
-		mv "Bullet-2.89-msvc${MSVC_YEAR}-win${BITS}${BULLET_DBL}" Bullet
+		eval 7z x -y "${DEPS}/Bullet-2.89-msvc${MSVC_YEAR}-win${BITS}-double.7z" $STRIP
+		mv "Bullet-2.89-msvc${MSVC_YEAR}-win${BITS}-double" Bullet
 	fi
 	add_cmake_opts -DBULLET_ROOT="$(real_pwd)/Bullet"
 	echo Done.
@@ -635,20 +649,20 @@ printf "FFmpeg 4.2.2... "
 cd $DEPS
 echo
 # MyGUI
-printf "MyGUI 3.4.0... "
+printf "MyGUI 3.2.3... "
 {
 	cd $DEPS_INSTALL
 	if [ -d MyGUI ] && \
 		grep "MYGUI_VERSION_MAJOR 3" MyGUI/include/MYGUI/MyGUI_Prerequest.h > /dev/null && \
 		grep "MYGUI_VERSION_MINOR 4" MyGUI/include/MYGUI/MyGUI_Prerequest.h > /dev/null && \
-		grep "MYGUI_VERSION_PATCH 0" MyGUI/include/MYGUI/MyGUI_Prerequest.h > /dev/null
+		grep "MYGUI_VERSION_PATCH 1" MyGUI/include/MYGUI/MyGUI_Prerequest.h > /dev/null
 	then
 		printf "Exists. "
 	elif [ -z $SKIP_EXTRACT ]; then
 		rm -rf MyGUI
-		eval 7z x -y "${DEPS}/MyGUI-3.4.0-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" $STRIP
-		[ -n "$PDBS" ] && eval 7z x -y "${DEPS}/MyGUI-3.4.0-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" $STRIP
-		mv "MyGUI-3.4.0-msvc${MSVC_REAL_YEAR}-win${BITS}" MyGUI
+		eval 7z x -y "${DEPS}/MyGUI-3.2.3-git-msvc2015-win${BITS}.7z" $STRIP
+		[ -n "$PDBS" ] && eval 7z x -y "${DEPS}/MyGUI-3.2.3-git-msvc2015-win${BITS}-sym.7z" $STRIP
+		mv "MyGUI-3.2.3-git-msvc2015-win${BITS}" MyGUI
 	fi
 	export MYGUI_HOME="$(real_pwd)/MyGUI"
 	if [ $CONFIGURATION == "Debug" ]; then
@@ -656,7 +670,7 @@ printf "MyGUI 3.4.0... "
 		MYGUI_CONFIGURATION="Debug"
 	else
 		SUFFIX=""
-		MYGUI_CONFIGURATION="RelWithDebInfo"
+		MYGUI_CONFIGURATION="Release"
 	fi
 	add_runtime_dlls "$(pwd)/MyGUI/bin/${MYGUI_CONFIGURATION}/MyGUIEngine${SUFFIX}.dll"
 	echo Done.
@@ -692,9 +706,9 @@ printf "OSG 3.6.5... "
 		printf "Exists. "
 	elif [ -z $SKIP_EXTRACT ]; then
 		rm -rf OSG
-		eval 7z x -y "${DEPS}/OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" $STRIP
-		[ -n "$PDBS" ] && eval 7z x -y "${DEPS}/OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" $STRIP
-		mv "OSG-3.6.5-msvc${MSVC_REAL_YEAR}-win${BITS}" OSG
+		eval 7z x -y "${DEPS}/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}.7z" $STRIP
+		[ -n "$PDBS" ] && eval 7z x -y "${DEPS}/OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}-sym.7z" $STRIP
+		mv "OSGoS-3.6.5-b02abe2-msvc${MSVC_REAL_YEAR}-win${BITS}" OSG
 	fi
 	OSG_SDK="$(real_pwd)/OSG"
 	add_cmake_opts -DOSG_DIR="$OSG_SDK"
@@ -816,6 +830,24 @@ printf "SDL 2.0.12... "
 	add_runtime_dlls "$(pwd)/SDL2-2.0.12/lib/x${ARCHSUFFIX}/SDL2.dll"
 	echo Done.
 }
+cd $DEPS
+echo
+# LuaJIT 2.1.0-beta3
+printf "LuaJIT 2.1.0-beta3... "
+{
+	if [ -d LuaJIT ]; then
+		printf "Exists. "
+	elif [ -z $SKIP_EXTRACT ]; then
+		rm -rf LuaJIT
+		eval 7z x -y LuaJIT-2.1.0-beta3-msvc${MSVC_REAL_YEAR}-win${BITS}.7z -o$(real_pwd)/LuaJIT $STRIP
+	fi
+	export LUAJIT_DIR="$(real_pwd)/LuaJIT"
+	add_cmake_opts -DLuaJit_INCLUDE_DIR="${LUAJIT_DIR}/include" \
+		-DLuaJit_LIBRARY="${LUAJIT_DIR}/lib/lua51.lib"
+	add_runtime_dlls "$(pwd)/LuaJIT/bin/lua51.dll"
+	echo Done.
+}
+
 cd $DEPS
 echo
 # Google Test and Google Mock
@@ -961,12 +993,77 @@ if [ -n "$ACTIVATE_MSVC" ]; then
 	echo
 fi
 
+cd $DEPS
+echo
+# CrabNet
+CRABNET_DEST=""
+echo "Configuring & Building CrabNet... "
+{	
+	CRABNET_DEST="${DEPS_INSTALL}/CrabNet"
+	if [ ! -d ${CRABNET_DEST} ]; then
+		CRABNET_BUILD_CONFIG="Release"
+		cd CrabNet
+		if [ ! -d build ]; then
+			mkdir build
+		else
+			rm -rf ./build/*
+		fi
+		cd build
+		RET=0
+		echo "Configuring CrabNet... "
+		run_cmd cmake -DCMAKE_BUILD_TYPE=${CRABNET_BUILD_CONFIG} -DCRABNET_ENABLE_DLL=OFF -DCRABNET_ENABLE_SAMPLES=OFF .. || RET=$?
+		if [ -z $VERBOSE ]; then
+			if [ $RET -eq 0 ]; then
+				echo "CrabNet configure Done."
+			else
+				echo "CrabNet configure Failed."
+			fi
+		fi
+		echo "Building CrabNet Debug... "
+		run_cmd cmake --build . --target RakNetLibStatic --config Debug --clean-first || RET=$?
+		if [ -z $VERBOSE ]; then
+			if [ $RET -eq 0 ]; then
+				echo "CrabNet Debug build Done."
+			else
+				echo "CrabNet Debug build Failed."
+			fi
+		fi
+		
+		echo "Building CrabNet Release... "
+		run_cmd cmake --build . --target RakNetLibStatic --config Release --clean-first || RET=$?
+		if [ -z $VERBOSE ]; then
+			if [ $RET -eq 0 ]; then
+				echo "CrabNet Release build Done."
+			else
+				echo "CrabNet Release build Failed."
+			fi
+		fi
+		
+		if [ ! -d ${CRABNET_DEST} ]; then
+			mkdir ${CRABNET_DEST}
+		else
+			rm -rf ${CRABNET_DEST}/*
+		fi
+		mkdir ${CRABNET_DEST}/lib
+		cp ./lib/Debug/*.lib ${CRABNET_DEST}/lib
+		cp ./lib/Release/*.lib ${CRABNET_DEST}/lib
+		cp -r ../include ${CRABNET_DEST}/include
+	else
+		echo "CrabNet exists"
+	fi
+	# echo ${CRABNET_DEST}
+	add_cmake_opts -DRakNet_LIBRARY_RELEASE="${CRABNET_DEST}/lib/RakNetLibStatic.lib" -DRakNet_LIBRARY_DEBUG="${CRABNET_DEST}/lib/RakNetLibStaticd.lib" -DRakNet_INCLUDES="${CRABNET_DEST}/include"
+}
+cd $DEPS_INSTALL/..
+echo
+
 if [ -z $VERBOSE ]; then
 	printf -- "- Configuring... "
 else
 	echo "- cmake .. $CMAKE_OPTS"
 fi
 RET=0
+add_cmake_opts -DOPENMW_LTO_BUILD=1
 run_cmd cmake .. $CMAKE_OPTS || RET=$?
 if [ -z $VERBOSE ]; then
 	if [ $RET -eq 0 ]; then
