@@ -539,6 +539,11 @@ if(WIN32)
     INSTALL(DIRECTORY "${OpenMW_BINARY_DIR}/Debug/resources" DESTINATION "." CONFIGURATIONS Debug)
     INSTALL(DIRECTORY "${OpenMW_BINARY_DIR}/Release/resources" DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
 
+    IF(BUILD_OPENMW_MP)
+        INSTALL(FILES "${OpenMW_BINARY_DIR}/Debug/tes3mp-server-default.cfg" DESTINATION "." CONFIGURATIONS Debug)
+        INSTALL(FILES "${OpenMW_BINARY_DIR}/Release/tes3mp-server-default.cfg" DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
+    ENDIF(BUILD_OPENMW_MP)
+
     FILE(GLOB plugin_dir_debug "${OpenMW_BINARY_DIR}/Debug/osgPlugins-*")
     FILE(GLOB plugin_dir_release "${OpenMW_BINARY_DIR}/Release/osgPlugins-*")
     INSTALL(DIRECTORY ${plugin_dir_debug} DESTINATION "." CONFIGURATIONS Debug)
