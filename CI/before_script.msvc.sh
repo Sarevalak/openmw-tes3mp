@@ -576,15 +576,12 @@ if [ -z $SKIP_DOWNLOAD ]; then
 		"LuaJIT-2.1.0-beta3-msvc${MSVC_REAL_YEAR}-win${BITS}.7z"
 	
 	# CrabNet
-	if [ ! -d CrabNet ]; then
-		git clone -b master https://github.com/TES3MP/CrabNet.git --depth 1
-	else
-		echo "CrabNet exists"
-		cd CrabNet
-		git pull
-		git checkout .
-		cd ..
-	fi
+	download "CrabNet Debug" \
+		"https://github.com/Sarevalak/CrabNet/releases/download/ci-build-1/CrabNet_MSVC${MSVC_REAL_YEAR}_x${BITS}_Debug_1045a36fd867e34b7419165a8672c7dcc833c726.zip" \
+		"CrabNet_MSVC${MSVC_REAL_YEAR}_x${BITS}_Debug_1045a36fd867e34b7419165a8672c7dcc833c726.zip"
+	download "CrabNet Release" \
+		"https://github.com/Sarevalak/CrabNet/releases/download/ci-build-1/CrabNet_MSVC${MSVC_REAL_YEAR}_x${BITS}_Release_1045a36fd867e34b7419165a8672c7dcc833c726.zip" \
+		"CrabNet_MSVC${MSVC_REAL_YEAR}_x${BITS}_Release_1045a36fd867e34b7419165a8672c7dcc833c726.zip"
 
 	# Google test and mock
 	if [ ! -z $TEST_FRAMEWORK ]; then
@@ -940,6 +937,29 @@ printf "LuaJIT 2.1.0-beta3... "
 }
 cd $DEPS
 echo
+# CrabNet
+printf "CrabNet... "
+{
+	if [ -d CrabNet ]; then
+		printf "Exists. "
+	elif [ -z $SKIP_EXTRACT ]; then
+		rm -rf CrabNet
+		mkdir $DEPS/CrabNet
+		eval 7z x -y CrabNet_MSVC${MSVC_REAL_YEAR}_x${BITS}_Release_1045a36fd867e34b7419165a8672c7dcc833c726.zip -o$(real_pwd)/CrabNet/Release $STRIP
+		eval 7z x -y CrabNet_MSVC${MSVC_REAL_YEAR}_x${BITS}_Debug_1045a36fd867e34b7419165a8672c7dcc833c726.zip -o$(real_pwd)/CrabNet/Debug $STRIP
+		cp -r $DEPS/CrabNet/Release/install/{include,lib} $DEPS/CrabNet
+		cp -r $DEPS/CrabNet/Debug/install/lib $DEPS/CrabNet
+		rm -rf $DEPS/CrabNet/Release
+		rm -rf $DEPS/CrabNet/Debug
+	fi
+	CRABNET_DIR="$(real_pwd)/CrabNet"
+	add_cmake_opts -DRakNet_LIBRARY_RELEASE="${CRABNET_DIR}/lib/RakNetLibStatic.lib" \
+		-DRakNet_LIBRARY_DEBUG="${CRABNET_DIR}/lib/RakNetLibStaticd.lib" \
+		-DRakNet_INCLUDES="${CRABNET_DIR}/include"
+	echo Done.
+}
+cd $DEPS
+echo
 # Google Test and Google Mock
 if [ ! -z $TEST_FRAMEWORK ]; then
 	printf "Google test 1.10.0 ..."
@@ -1113,67 +1133,6 @@ if [ -n "$ACTIVATE_MSVC" ]; then
 	echo
 fi
 
-cd $DEPS
-echo
-# CrabNet
-CRABNET_DEST=""
-echo "Configuring & Building CrabNet... "
-{	
-	CRABNET_DEST="${DEPS_INSTALL}/CrabNet"
-	if [ ! -d ${CRABNET_DEST} ]; then
-		CRABNET_BUILD_CONFIG="Release"
-		cd CrabNet
-		if [ ! -d build ]; then
-			mkdir build
-		else
-			rm -rf ./build/*
-		fi
-		cd build
-		RET=0
-		echo "Configuring CrabNet... "
-		run_cmd cmake -DCMAKE_BUILD_TYPE=${CRABNET_BUILD_CONFIG} -DCRABNET_ENABLE_DLL=OFF -DCRABNET_ENABLE_SAMPLES=OFF .. || RET=$?
-		if [ -z $VERBOSE ]; then
-			if [ $RET -eq 0 ]; then
-				echo "CrabNet configure Done."
-			else
-				echo "CrabNet configure Failed."
-			fi
-		fi
-		echo "Building CrabNet Debug... "
-		run_cmd cmake --build . --target RakNetLibStatic --config Debug --clean-first || RET=$?
-		if [ -z $VERBOSE ]; then
-			if [ $RET -eq 0 ]; then
-				echo "CrabNet Debug build Done."
-			else
-				echo "CrabNet Debug build Failed."
-			fi
-		fi
-		
-		echo "Building CrabNet Release... "
-		run_cmd cmake --build . --target RakNetLibStatic --config Release --clean-first || RET=$?
-		if [ -z $VERBOSE ]; then
-			if [ $RET -eq 0 ]; then
-				echo "CrabNet Release build Done."
-			else
-				echo "CrabNet Release build Failed."
-			fi
-		fi
-		
-		if [ ! -d ${CRABNET_DEST} ]; then
-			mkdir ${CRABNET_DEST}
-		else
-			rm -rf ${CRABNET_DEST}/*
-		fi
-		mkdir ${CRABNET_DEST}/lib
-		cp ./lib/Debug/*.lib ${CRABNET_DEST}/lib
-		cp ./lib/Release/*.lib ${CRABNET_DEST}/lib
-		cp -r ../include ${CRABNET_DEST}/include
-	else
-		echo "CrabNet exists"
-	fi
-	# echo ${CRABNET_DEST}
-	add_cmake_opts -DRakNet_LIBRARY_RELEASE="${CRABNET_DEST}/lib/RakNetLibStatic.lib" -DRakNet_LIBRARY_DEBUG="${CRABNET_DEST}/lib/RakNetLibStaticd.lib" -DRakNet_INCLUDES="${CRABNET_DEST}/include"
-}
 cd $DEPS_INSTALL/..
 echo
 

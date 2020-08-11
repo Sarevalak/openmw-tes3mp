@@ -2,14 +2,13 @@ version: "{build}"
 
 branches:
     only:
-        - master
-        - /openmw-.*$/
-        - appveyor
+        - unstable
+        - CI
 
 environment:
     matrix:
-        - msvc: 2017
-          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+#        - msvc: 2017
+#          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
         - msvc: 2019
           APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
 
@@ -59,8 +58,8 @@ build_script:
     - cmd: cmake --install %build% --config %configuration%
 
 after_build:
-    - cmd: if %PLATFORM%==x64 7z a OpenMW_MSVC%msvc%_%platform%_%appveyor_pull_request_number%_%appveyor_pull_request_head_commit%.zip %APPVEYOR_BUILD_FOLDER%\install -xr"!*.pdb"
-    #- cmd: if %PLATFORM%==x64 7z a OpenMW_MSVC%msvc%_%platform%_%appveyor_pull_request_number%_%appveyor_pull_request_head_commit%_pdb.zip %APPVEYOR_BUILD_FOLDER%\MSVC%msvc%_64\%configuration%\*.pdb
+    - cmd: if %PLATFORM%==x64 7z a OpenMW_MSVC%msvc%_%platform%_%appveyor_repo_commit%.zip %APPVEYOR_BUILD_FOLDER%\install -xr"!*.pdb"
+    #- cmd: if %PLATFORM%==x64 7z a OpenMW_MSVC%msvc%_%platform%_%appveyor_repo_commit%_pdb.zip %APPVEYOR_BUILD_FOLDER%\MSVC%msvc%_64\%configuration%\*.pdb
 
 test: off
 
@@ -72,7 +71,7 @@ test: off
 #    on_build_status_changed: true
 
 artifacts:
-  - path: OpenMW_MSVC%msvc%_%platform%_%appveyor_pull_request_number%_%appveyor_pull_request_head_commit%.zip
-    name: OpenMW_MSVC%msvc%_%platform%_%appveyor_pull_request_number%_%appveyor_pull_request_head_commit%
-  #- path: OpenMW_MSVC%msvc%_%platform%_%appveyor_pull_request_number%_%appveyor_pull_request_head_commit%_pdb.zip
-  #  name: OpenMW_MSVC%msvc%_%platform%_%appveyor_pull_request_number%_%appveyor_pull_request_head_commit%_pdb
+  - path: OpenMW_MSVC%msvc%_%platform%_%appveyor_repo_commit%.zip
+    name: OpenMW_MSVC%msvc%_%platform%_%appveyor_repo_commit%
+  #- path: OpenMW_MSVC%msvc%_%platform%_%appveyor_repo_commit%_pdb.zip
+  #  name: OpenMW_MSVC%msvc%_%platform%_%appveyor_repo_commit%_pdb
